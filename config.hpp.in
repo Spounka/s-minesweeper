@@ -1,0 +1,10 @@
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
+
+#cmakedefine RESOURCES_DIR "${RESOURCES_DIR}"
+
+enum {
+    TEXTURE_LOAD_ERROR = 1,
+};
+
+#endif
