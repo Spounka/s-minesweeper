@@ -48,9 +48,6 @@ _deps
 # Build dir
 build/
 
-# clang format file
-.clang*
-
 # Misc
 .vscode/
 obsidian*
