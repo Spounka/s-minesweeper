@@ -3,8 +3,13 @@
 
 #cmakedefine RESOURCES_DIR "${RESOURCES_DIR}"
 
+namespace sp
+{
+
 enum {
-    TEXTURE_LOAD_ERROR = 1,
+    FILE_LOAD_ERROR = 1,
 };
+
+} // namespace sp
 
 #endif

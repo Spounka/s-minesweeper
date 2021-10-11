@@ -19,7 +19,7 @@ ResourceManager::getTexture(std::string const& filename)
     auto& texture = textureMap[filename];
     if(!texture.loadFromFile(filename)) {
         std::fprintf(stderr, "Failed to load texture, aborting\n");
-        exit(TEXTURE_LOAD_ERROR);
+        exit(FILE_LOAD_ERROR);
     }
     return texture;
 }
