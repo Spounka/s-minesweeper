@@ -1,7 +1,7 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#cmakedefine RESOURCES_DIR "${RESOURCES_DIR}"
+#cmakedefine RESOURCES_DIR "${RESOURCES_DIR}/"
 
 namespace sp
 {
