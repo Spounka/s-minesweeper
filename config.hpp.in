@@ -1,11 +1,13 @@
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
+// configured in config.hpp.in
 #cmakedefine RESOURCES_DIR "${RESOURCES_DIR}/"
 
 namespace sp
 {
 
+// An enum for holding error codes
 enum {
     FILE_LOAD_ERROR = 1,
 };

@@ -8,34 +8,41 @@
 namespace sp
 {
 
-Button::Button(const sf::Texture& texutre, std::string const& label)
-    : sf::Sprite(texutre)
+Button::Button(const sf::Texture& texture, std::string const& label)
+    : sf::Sprite(texture)
 {
+    // Centering the origin for easier manipulation
     this->setOrigin(this->getLocalBounds().width / 2,
                     this->getLocalBounds().height / 2);
+    // ! Hard codeded font, move this to config.hpp
     this->label.setFont(
         ResourceManager::getFont(RESOURCES_DIR "Inconsolata-Regular.ttf"));
-    this->setLabel(label);
+
+    this->setString(label);
 }
 
 void
-Button::setLabel(std::string const& label)
+Button::setString(std::string const& label)
 {
     this->label.setString(label);
+
+    // Centering the font each time the label gets changed to make sure it's
+    // always correct
     auto labelBounds = this->label.getLocalBounds();
     this->label.setOrigin(labelBounds.left + labelBounds.width / 2,
                           labelBounds.top + labelBounds.height / 2);
+
     this->label.setPosition(this->getPosition());
 }
 
 const sf::String
-Button::getLabel() const
+Button::getString() const
 {
     return this->label.getString();
 }
 
 const sf::Text&
-Button::getText() const
+Button::getLabelObject() const
 {
     return this->label;
 }
@@ -43,6 +50,8 @@ Button::getText() const
 void
 Button::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    // Drawing the sprite before the label, order is important to make sure text
+    // is always on top
     this->Sprite::draw(target, states);
     target.draw(this->label);
 }
@@ -86,6 +95,10 @@ Button::onClick(void (*func)())
 void
 Button::update(sf::Window const& window)
 {
+    // Check if mouse is pressed and is within button bounds
+    //! Warning: The collision check doesn't work if the mouse is at the very
+    //!          left / bottom of the button
+
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if(this->getGlobalBounds().contains(
                static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)))) {
