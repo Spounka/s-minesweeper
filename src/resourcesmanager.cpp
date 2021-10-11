@@ -23,4 +23,22 @@ ResourceManager::getTexture(std::string const& filename)
     }
     return texture;
 }
+
+sf::Font&
+ResourceManager::getFont(std::string const& filename)
+{
+    auto& fontMap = getInstance().fonts;
+    auto fontPair = fontMap.find(filename);
+
+    if(fontPair != fontMap.end()) {
+        return fontPair->second;
+    }
+
+    auto& font = fontMap[filename];
+    if(!font.loadFromFile(filename)) {
+        std::fprintf(stderr, "Failed to load font, aborting\n");
+        exit(FILE_LOAD_ERROR);
+    }
+    return font;
+}
 }

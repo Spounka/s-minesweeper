@@ -18,6 +18,7 @@ class ResourceManager
     }
 
     static sf::Texture& getTexture(std::string const& filename);
+    static sf::Font& getFont(std::string const& filename);
 
     ~ResourceManager() = default;
     ResourceManager(ResourceManager&) = delete;
@@ -30,6 +31,7 @@ class ResourceManager
 
   private:
     std::map<std::string, sf::Texture> textures;
+    std::map<std::string, sf::Font> fonts;
 };
 }
 
