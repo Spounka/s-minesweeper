@@ -34,6 +34,7 @@ Button::Button(const Button& other)
 
     this->setOrigin(this->getLocalBounds().width / 2,
                     this->getLocalBounds().height / 2);
+    this->enabled = other.enabled;
 }
 
 ICloneable*

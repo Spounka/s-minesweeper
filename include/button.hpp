@@ -44,6 +44,12 @@ class Button : public sf::Sprite, public ICloneable
         this->enabled = value;
     }
 
+    inline bool
+    GetActive() const
+    {
+        return this->enabled;
+    }
+
     inline void
     SetID(int _id)
     {
@@ -63,8 +69,6 @@ class Button : public sf::Sprite, public ICloneable
 
   private:
     sf::Text label; //< The button display text
-    sf::RectangleShape
-        boundingBox; //< Bounding box surrounding the rectangle // ! Remove
 
     bool enabled = true;
     int id = 1;
@@ -73,6 +77,8 @@ class Button : public sf::Sprite, public ICloneable
 
     void (*callback)(void* args); //< Callback variable
     void* callback_args;
+
+    void (*rightCallback)(void* args);
 };
 }
 
