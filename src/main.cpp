@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <memory>
 
 #include "button.hpp"
 #include "config.hpp"
@@ -10,11 +11,12 @@
 
 const int FIELD_WIDTH = 10;
 const int FIELD_HEIGHT = 10;
-const int MINES = 39;
+int remainingMines = 20;
 
 bool expanded = false;
-std::vector<sp::Button*> buttons(FIELD_WIDTH* FIELD_HEIGHT);
+std::vector<std::unique_ptr<sp::Button>> buttons(FIELD_WIDTH* FIELD_HEIGHT);
 std::vector<int> mines(FIELD_WIDTH* FIELD_HEIGHT, 0);
+std::vector<bool> expandedButtons(FIELD_WIDTH* FIELD_HEIGHT, false);
 auto gameOver = false;
 
 int
@@ -46,7 +48,7 @@ onButtonClick(void* args = nullptr)
     if(!expanded) {
         expanded = true;
         int i = 0;
-        while(i < MINES) {
+        while(i < remainingMines) {
             int randPos = rand() % (FIELD_WIDTH * FIELD_HEIGHT);
             if(randPos == index || mines[randPos] == -1) {
                 continue;
@@ -67,40 +69,47 @@ onButtonClick(void* args = nullptr)
         sp::ResourceManager::getTexture(RESOURCES_DIR "button_clicked.png"));
 }
 
+void
+initGame()
+{
+    expanded = false;
+    auto button = sp::Button(
+        sp::ResourceManager::getTexture(RESOURCES_DIR "Button2.png"), "");
+    auto sizeX = button.getTextureRect().width;
+    auto sizeY = button.getTextureRect().height;
+    button.Enable(true);
+
+    for(int i = 0; i < FIELD_WIDTH; i++) {
+        for(int j = 0; j < FIELD_HEIGHT; j++) {
+            int index = j * FIELD_WIDTH + i;
+            buttons[index] = std::unique_ptr<sp::Button>(
+                dynamic_cast<sp::Button*>(button.clone()));
+
+            buttons[index]->setPosition(
+                sf::Vector2f(sizeX * i + sizeX, sizeY * j + sizeY));
+            buttons[index]->SetID(index);
+            buttons[index]->onClick(&onButtonClick, &buttons[index]->getID());
+        }
+    }
+}
+
 int
 main(int argc, char** argv)
 {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
                             "SMinesweeper");
 
-    {
-        sp::Button button(
-            sp::ResourceManager::getTexture(RESOURCES_DIR "Button2.png"));
-        auto sizeX = button.getTextureRect().width;
-        auto sizeY = button.getTextureRect().height;
-
-        for(int i = 0; i < FIELD_WIDTH; i++) {
-            for(int j = 0; j < FIELD_HEIGHT; j++) {
-                int index = j * FIELD_WIDTH + i;
-                buttons[index] = dynamic_cast<sp::Button*>(button.clone());
-                buttons[index]->setPosition(
-                    sf::Vector2f(sizeX * i + sizeX, sizeY * j + sizeY));
-                buttons[index]->setString("");
-                buttons[index]->SetID(index);
-                buttons[index]->onClick(&onButtonClick,
-                                        &buttons[index]->getID());
-            }
-        }
-    }
-
     auto gameOverText
-        = sf::Text("Game Over",
+        = sf::Text("Game Over\nPress Space to restart",
                    sp::ResourceManager::getFont(RESOURCES_DIR "FreeMono.otf"));
     gameOverText.setOrigin(gameOverText.getGlobalBounds().width / 2
                                + gameOverText.getGlobalBounds().left,
                            gameOverText.getGlobalBounds().height / 2
                                + gameOverText.getGlobalBounds().top);
     gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+
+    initGame();
+
     while(window.isOpen()) {
         sf::Event event;
         while(window.pollEvent(event)) {
@@ -109,20 +118,19 @@ main(int argc, char** argv)
         }
         window.clear();
         if(!gameOver) {
-
             for(int i = 0; i < buttons.size(); i++) {
                 buttons[i]->update(window);
                 window.draw(*buttons[i]);
             }
         } else {
             window.draw(gameOverText);
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
+               && window.hasFocus()) {
+                initGame();
+                gameOver = false;
+            }
         }
-
         window.display();
-    }
-
-    for(int i = 0; i < buttons.size(); i++) {
-        delete buttons[i];
     }
 
     return EXIT_SUCCESS;
