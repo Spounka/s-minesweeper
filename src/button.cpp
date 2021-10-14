@@ -21,6 +21,27 @@ Button::Button(const sf::Texture& texture, std::string const& label)
     this->setString(label);
 }
 
+Button::Button(const Button& other)
+{
+    this->setTexture(*other.getTexture());
+
+    this->label = sf::Text(other.label);
+    this->label.setFont(
+        ResourceManager::getFont(RESOURCES_DIR "Inconsolata-Regular.ttf"));
+    this->setString(other.label.getString());
+
+    this->callback = other.callback;
+
+    this->setOrigin(this->getLocalBounds().width / 2,
+                    this->getLocalBounds().height / 2);
+}
+
+ICloneable*
+Button::clone() const
+{
+    return new Button(*this);
+}
+
 void
 Button::setString(std::string const& label)
 {
@@ -85,11 +106,10 @@ Button::setPosition(sf::Vector2f const& position)
 }
 
 void
-Button::onClick(void (*func)())
+Button::onClick(void (*func)(void* arg), void* args)
 {
-    if(func != nullptr) {
-        this->callback = func;
-    }
+    this->callback = func;
+    this->callback_args = args;
 }
 
 void
@@ -98,12 +118,22 @@ Button::update(sf::Window const& window)
     // Check if mouse is pressed and is within button bounds
     //! Warning: The collision check doesn't work if the mouse is at the very
     //!          left / bottom of the button
+    if(!window.hasFocus() || !this->enabled)
+        return;
+
+    if(this->elapsedTime > sf::milliseconds(0))
+        this->elapsedTime -= sf::milliseconds(1);
+    else if(this->elapsedTime < sf::milliseconds(0)) {
+        this->elapsedTime = sf::milliseconds(0);
+    }
 
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
         if(this->getGlobalBounds().contains(
                static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)))) {
-            if(this->callback != nullptr) {
-                this->callback();
+            if(this->callback != nullptr
+               && this->elapsedTime <= sf::milliseconds(0)) {
+                this->callback(this->callback_args);
+                this->elapsedTime = sf::milliseconds(50);
             }
         }
     }
