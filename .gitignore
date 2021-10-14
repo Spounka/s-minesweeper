@@ -52,3 +52,4 @@ build/
 .vscode/
 obsidian*
 include/config.hpp
+cspell.config.yaml
