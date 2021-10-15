@@ -20,10 +20,14 @@ std::default_random_engine generator(seed);
 std::uniform_int_distribution<int> distribution(0, FIELD_WIDTH* FIELD_HEIGHT);
 auto randInt = std::bind(distribution, generator);
 
-std::vector<std::unique_ptr<sp::Button>> buttons(FIELD_WIDTH* FIELD_HEIGHT);
-std::vector<int> mines(FIELD_WIDTH* FIELD_HEIGHT, 0);
-std::vector<bool> expandedButtons(FIELD_WIDTH* FIELD_HEIGHT, false);
-std::vector<bool> flaggedButtons(FIELD_WIDTH* FIELD_WIDTH, false);
+std::vector<std::unique_ptr<sp::Button>>
+buttons(FIELD_WIDTH* FIELD_HEIGHT); // List of buttons
+std::vector<int> mines(FIELD_WIDTH* FIELD_HEIGHT,
+                       0); // < List of mines locations
+std::vector<bool> expandedButtons(FIELD_WIDTH* FIELD_HEIGHT,
+                                  false); // < List of buttons expanded
+std::vector<bool> flaggedButtons(FIELD_WIDTH* FIELD_WIDTH,
+                                 false); //< List of buttons marked as bomb
 
 auto expanded = false;
 auto gameOver = false;
@@ -41,8 +45,9 @@ int
 expand_button(int index)
 {
     int numberOfMines = 0;
-    int x = index % FIELD_WIDTH;
-    int y = index / FIELD_HEIGHT;
+    // * Conversion from 1D to 2D array
+    int x = index % FIELD_WIDTH;  // * This is the column value
+    int y = index / FIELD_HEIGHT; // * This is the row
 
     for(int i = -1; i < 2; i++) {
         bool yWithinBounds = (y + i >= 0) && (y + i < FIELD_HEIGHT);
@@ -52,9 +57,7 @@ expand_button(int index)
             if(xWithinBounds && yWithinBounds) {
                 if(mines[neighbourMine] == -1 && neighbourMine != index) {
                     numberOfMines++;
-                } /* else if(neighbourMine != index)
-                    displayMines(neighbourMine);
- */
+                }
             }
         }
     }
@@ -104,6 +107,7 @@ onButtonClick(void* args)
         return;
 
     if(!expanded) {
+        // If first click, generate minefield and expand the button
         expanded = true;
         int i = 0;
         while(i < remainingMines) {
@@ -115,6 +119,7 @@ onButtonClick(void* args)
             i++;
         }
     } else if(mines[index] == -1) {
+        // We stepped on a mine, game over
         buttons[index]->setString("B");
         gameOver = true;
         gameOverText.setString("Game Over\nPress Space to restart\n");
@@ -193,7 +198,6 @@ updateGame(sf::RenderWindow& window)
             buttons[i]->update(window);
             window.draw(*buttons[i]);
         }
-    } else if(gameWon) {
     } else {
         window.draw(gameOverText);
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
