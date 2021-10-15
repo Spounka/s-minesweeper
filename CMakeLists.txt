@@ -14,10 +14,10 @@ include_directories("extern/SFML-2.5.1/include")
 include_directories("include")
 
 set(PROJECT_SOURCE_FILES "src/main.cpp" "src/button.cpp"
-                         "src/resourcesmanager.cpp")
+                         "src/resourcesmanager.cpp" "src/game.cpp")
 
 set(PROJECT_HEADER_FILES "include/button.hpp" "include/resourcesmanager.hpp"
-                         "include/config.hpp")
+                         "include/config.hpp" "include/game.hpp")
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} sfml-window sfml-graphics)
