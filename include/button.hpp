@@ -65,6 +65,12 @@ class Button : public sf::Sprite, public ICloneable
         return this->id;
     }
 
+    const inline std::string
+    GetString() const
+    {
+        return this->label.getString();
+    }
+
   protected:
     // ! This function was exposed from the SFML library, Find a better fix
     virtual void draw(sf::RenderTarget& target,
