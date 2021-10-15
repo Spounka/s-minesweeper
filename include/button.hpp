@@ -34,6 +34,9 @@ class Button : public sf::Sprite, public ICloneable
     // * On click callback function
     void onClick(void (*callback)(void* args), void* args = nullptr);
 
+    // * On right click callback function
+    void onRightClick(void (*func)(void* args));
+
     // * Updates the button (currently calls the callback function only)
     // TODO: Add animations
     void update(sf::Window const&);

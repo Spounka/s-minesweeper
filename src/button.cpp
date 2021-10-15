@@ -114,6 +114,12 @@ Button::onClick(void (*func)(void* arg), void* args)
 }
 
 void
+Button::onRightClick(void (*func)(void* args))
+{
+    this->rightCallback = func;
+}
+
+void
 Button::update(sf::Window const& window)
 {
     // Check if mouse is pressed and is within button bounds
@@ -134,6 +140,16 @@ Button::update(sf::Window const& window)
             if(this->callback != nullptr
                && this->elapsedTime <= sf::milliseconds(0)) {
                 this->callback(this->callback_args);
+                this->elapsedTime = sf::milliseconds(50);
+            }
+        }
+    }
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+        if(this->getGlobalBounds().contains(
+               static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)))) {
+            if(this->rightCallback != nullptr
+               && this->elapsedTime <= sf::milliseconds(0)) {
+                this->rightCallback(this->callback_args);
                 this->elapsedTime = sf::milliseconds(50);
             }
         }
