@@ -1,7 +1,33 @@
 #include "game.hpp"
 #include "config.hpp"
 #include "resourcesmanager.hpp"
+
+#include <SFML/Graphics.hpp>
 #include <iostream>
+
+const int FIELD_WIDTH = 10;
+const int FIELD_HEIGHT = 10;
+const int MAX_MINES = 20;
+int remainingMines = MAX_MINES;
+sf::Text remainingMinesText
+    = sf::Text("Remaining mines: ",
+               sp::ResourceManager::getFont(RESOURCES_DIR "FreeMono.otf"));
+sf::Text gameOverText
+    = sf::Text("", sp::ResourceManager::getFont(RESOURCES_DIR "FreeMono.otf"));
+
+uint seed = std::chrono::system_clock::now().time_since_epoch().count();
+std::default_random_engine generator(seed);
+std::uniform_int_distribution<int> distribution(0, FIELD_WIDTH* FIELD_HEIGHT);
+auto randInt = std::bind(distribution, generator);
+
+std::vector<std::unique_ptr<sp::Button>> buttons(FIELD_WIDTH* FIELD_HEIGHT);
+std::vector<int> mines(FIELD_WIDTH* FIELD_HEIGHT, 0);
+std::vector<bool> expandedButtons(FIELD_WIDTH* FIELD_HEIGHT, false);
+std::vector<bool> flaggedButtons(FIELD_WIDTH* FIELD_WIDTH, false);
+
+auto expanded = false;
+auto gameOver = false;
+auto gameWon = false;
 
 void
 updateRemainingMinesText()
@@ -26,8 +52,9 @@ expand_button(int index)
             if(xWithinBounds && yWithinBounds) {
                 if(mines[neighbourMine] == -1 && neighbourMine != index) {
                     numberOfMines++;
-                } else if(neighbourMine != index)
+                } /* else if(neighbourMine != index)
                     displayMines(neighbourMine);
+ */
             }
         }
     }
@@ -45,6 +72,14 @@ checkForWinCondition()
         }
     }
     gameWon = temp;
+    if(temp) {
+        gameOverText.setString("Game Won");
+        gameOverText.setOrigin(gameOverText.getGlobalBounds().width / 2
+                                   + gameOverText.getGlobalBounds().left,
+                               gameOverText.getGlobalBounds().height / 2
+                                   + gameOverText.getGlobalBounds().top);
+        gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    }
 }
 
 void
@@ -82,6 +117,12 @@ onButtonClick(void* args)
     } else if(mines[index] == -1) {
         buttons[index]->setString("B");
         gameOver = true;
+        gameOverText.setString("Game Over\nPress Space to restart\n");
+        gameOverText.setOrigin(gameOverText.getGlobalBounds().width / 2
+                                   + gameOverText.getGlobalBounds().left,
+                               gameOverText.getGlobalBounds().height / 2
+                                   + gameOverText.getGlobalBounds().top);
+        gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
         return;
     }
     displayMines(index);
@@ -142,4 +183,23 @@ initGame()
             buttons[index]->onRightClick(&onRightButtonClick);
         }
     }
+}
+
+void
+updateGame(sf::RenderWindow& window)
+{
+    if(!gameOver) {
+        for(int i = 0; i < buttons.size(); i++) {
+            buttons[i]->update(window);
+            window.draw(*buttons[i]);
+        }
+    } else if(gameWon) {
+    } else {
+        window.draw(gameOverText);
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
+           && window.hasFocus()) {
+            initGame();
+        }
+    }
+    window.draw(remainingMinesText);
 }

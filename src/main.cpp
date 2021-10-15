@@ -9,14 +9,6 @@ main(int argc, char** argv)
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT),
                             "SMinesweeper");
 
-    auto gameOverText
-        = sf::Text("Game Over\nPress Space to restart",
-                   sp::ResourceManager::getFont(RESOURCES_DIR "FreeMono.otf"));
-    gameOverText.setOrigin(gameOverText.getGlobalBounds().width / 2
-                               + gameOverText.getGlobalBounds().left,
-                           gameOverText.getGlobalBounds().height / 2
-                               + gameOverText.getGlobalBounds().top);
-    gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 
     initGame();
 
@@ -27,31 +19,7 @@ main(int argc, char** argv)
                 window.close();
         }
         window.clear();
-        if(!gameOver) {
-            for(int i = 0; i < buttons.size(); i++) {
-                buttons[i]->update(window);
-                window.draw(*buttons[i]);
-            }
-        } else if(gameWon) {
-            gameOverText.setString("Game Won");
-            gameOverText.setOrigin(gameOverText.getGlobalBounds().width / 2
-                                       + gameOverText.getGlobalBounds().left,
-                                   gameOverText.getGlobalBounds().height / 2
-                                       + gameOverText.getGlobalBounds().top);
-            gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
-            window.draw(gameOverText);
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
-               && window.hasFocus()) {
-                initGame();
-            }
-        } else {
-            window.draw(gameOverText);
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
-               && window.hasFocus()) {
-                initGame();
-            }
-        }
-        window.draw(remainingMinesText);
+        updateGame(window);
         window.display();
     }
 
