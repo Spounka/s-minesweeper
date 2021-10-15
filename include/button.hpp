@@ -60,7 +60,7 @@ class Button : public sf::Sprite, public ICloneable
     }
 
     inline int&
-    getID()
+    GetID()
     {
         return this->id;
     }

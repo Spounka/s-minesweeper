@@ -179,7 +179,7 @@ initGame()
             buttons[index]->setPosition(
                 sf::Vector2f(sizeX * i + sizeX, sizeY * j + sizeY));
             buttons[index]->SetID(index);
-            buttons[index]->onClick(&onButtonClick, &buttons[index]->getID());
+            buttons[index]->onClick(&onButtonClick, &buttons[index]->GetID());
             buttons[index]->onRightClick(&onRightButtonClick);
         }
     }
